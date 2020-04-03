@@ -1,8 +1,9 @@
 $(() => {
-    let $inputs = $('.form')
-    let $inputEmail = $('input[name="email"]')
-    let $inputPassword = $('input[name="password"]')
-    let $inputConfirmPassword = $('input[name="confirmpassword"]')
+    // mensagens de erro no formulário
+    let $inputEmail = $('input#email')
+    let $inputPassword = $('input#password')
+    let $inputConfirmPassword = $('input#confirmpassword')
+    let $inputNewPassword = $('input#newpassword')
 
     $inputEmail.on('blur', (e) => {
         if ($inputEmail.val() == '') {
@@ -22,12 +23,32 @@ $(() => {
         }
     })
 
+    $inputNewPassword.on('blur', (e) => {
+        if ($inputNewPassword.val() == '') {
+            insertInvalidFeedback($inputNewPassword, 'Insira uma senha!')
+        } else {
+            removeInvalidFeedback($inputNewPassword)
+            insertValidFeedback($inputNewPassword)
+        }
+    })
+
     $inputConfirmPassword.on('blur', (e) => {
         if ($inputConfirmPassword.val() == '') {
             insertInvalidFeedback($inputConfirmPassword, 'Confirme a senha!')
         } else {
             removeInvalidFeedback($inputConfirmPassword)
             insertValidFeedback($inputConfirmPassword)
+        }
+    })
+
+    // mensagem de alerta no botão deletar
+    let $btndelete = $('form button#btndelete')
+    $btndelete.on('click', (e) => {
+        let cfm = confirm('Deseja deletar esse usuário?')
+        if (cfm) {
+
+        } else {
+            e.preventDefault()
         }
     })
 

@@ -29,12 +29,23 @@ router.post('/users/cadsave', (req, res) => {
             let salt = bcrypt.genSaltSync(10)
             let hash = bcrypt.hashSync(password, salt)
             if (hash) {
-                User.create({
-                    email: email,
-                    password: hash
+                User.findOne({
+                    where: {
+                        email: email
+                    }
+                }).then(user => {
+                    if (!user) {
+                        User.create({
+                            email: email,
+                            password: hash
+                        })
+                        req.flash('success_msg', 'Usuário cadastrado com sucesso!')
+                        res.redirect('/')
+                    } else {
+                        req.flash('error_msg', 'Usuário já está cadastrado!')
+                        res.redirect('/users/cad')
+                    }
                 })
-                req.flash('success_msg', 'Usuário cadastrado com sucesso!')
-                res.redirect('/')
             } else {
                 req.flash('error_msg', 'Houve um erro ao gerar senha!')
                 res.redirect('/users/cad')
@@ -50,12 +61,128 @@ router.get('/admin/login', (req, res) => {
     res.render('users/users_login')
 })
 
-router.get('/admin/edit', (req, res) => {
-    res.render('users/users_edit')
+router.get('/admin/edit/:id', (req, res) => {
+    let id = req.params.id
+    User.findByPk(id)
+        .then(user => {
+            if (user && !isNaN(id)) {
+                res.render('users/users_edit', {
+                    user: user
+                })
+            } else {
+                req.flash('error_msg', 'Usuário não encontrado')
+                res.redirect('/admin/users')
+            }
+        })
+        .catch(err => {
+            req.flash('error_msg', 'Erro intetno!')
+            res.redirect('/admin/users')
+        })
+})
+
+router.post('/admin/edited', (req, res) => {
+    let id = req.body.id
+    let password = req.body.password
+    let newpassword = req.body.newpassword
+    let confirmpassword = req.body.confirmpassword
+
+    if (newpassword == confirmpassword) {
+        cont = false
+        if (!password || password == typeof undefined || password == null) {
+            func.msgInvalid.msgFeedback(req, 'feedbackPassword', 'attrClassPassword', 'Houve um erro, verifique os campos em vermelho!', 'Campo senha ficou fazio!')
+        }
+        if (!newpassword || newpassword == typeof undefined || newpassword == null) {
+            func.msgInvalid.msgFeedback(req, 'feedbackConfirmPassword', 'attrClassPassword', 'Houve um erro, verifique os campos em vermelho!', 'Campo nova senha ficou fazio!')
+        }
+        if (!confirmpassword || confirmpassword == typeof undefined || confirmpassword == null) {
+            func.msgInvalid.msgFeedback(req, 'feedbackConfirmPassword', 'attrClassPassword', 'Houve um erro, verifique os campos em vermelho!', 'Campo confirma senha ficou fazio!')
+        }
+        if (cont) {
+            res.redirect('/admin/edit/' + id)
+        } else {
+            User.findByPk(id)
+                .then(user => {
+                    if (user && !isNaN(id)) {
+                        let compare = bcrypt.compareSync(password, user.password)
+                        if (compare) {
+                            let salt = bcrypt.genSaltSync(10)
+                            let hash = bcrypt.hashSync(newpassword, salt)
+                            User.update({
+                                    password: hash
+                                }, {
+                                    where: {
+                                        id: id
+                                    }
+                                })
+                                .then(() => {
+                                    req.flash('success_msg', 'Senha alterada com sucess!')
+                                    res.redirect('/')
+                                })
+                                .catch(err => {
+                                    req.flash('error_msg', 'Erro interno!')
+                                    res.redirect('/admin/edit/' + id)
+                                })
+                        } else {
+                            req.flash('error_msg', 'Senha não confere!')
+                            res.redirect('/admin/edit/' + id)
+                        }
+                    } else {
+                        req.flash('error_msg', 'Usuário não encontrado!')
+                        res.redirect('/admin/edit/' + id)
+                    }
+                })
+                .catch(err => {
+                    req.flash('error_msg', 'Erro interno!')
+                    res.redirect('/admin/edit/' + id)
+                })
+        }
+    } else {
+        func.msgInvalid.msgFeedback(req, 'feedbackPassword', 'attrClassPassword', 'Senhas não são iguais!', '')
+        res.redirect('/admin/edit/' + id)
+    }
+
+
+})
+
+router.post('/admin/delete', (req, res) => {
+    let id = req.body.id
+    if (id && !isNaN(id)) {
+        User.destroy({
+                where: {
+                    id: id
+                }
+            })
+            .then(() => {
+                req.flash('success_msg', 'Usuário deletado!')
+                res.redirect('/admin/users')
+            })
+            .catch(err => {
+                req.flash('error_msg', 'Erro interno!')
+                res.redirect('/admin/users')
+            })
+    } else {
+        req.flash('error_msg', 'Usuário não encontrado!')
+        res.redirect('/admin/users')
+    }
 })
 
 router.get('/admin/users', (req, res) => {
-    res.render('users/users')
+    User.findAll()
+        .then(users => {
+            if (users) {
+                res.render('users/users', {
+                    users: users,
+                    msg: 'Não existe usuário cadastrado'
+                })
+            } else {
+                req.flash('error_msg', 'Erro interno!')
+                res.redirect('/')
+            }
+        })
+        .catch(err => {
+            req.flash('error_msg', 'Erro interno!')
+            res.redirect('/')
+        })
 })
 
 

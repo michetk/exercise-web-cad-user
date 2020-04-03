@@ -1,0 +1,46 @@
+<%- include('../partials/_header.ejs') -%>
+
+<%- include('../partials/_navbar.ejs') -%>
+<%- include('../partials/_msg.ejs') -%>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col col-lg-12">
+            <div class="card-header border">
+                Usuários
+            </div>
+            <% if (users != '') { %>
+            <table class="table table-sm table-hover table-bordered">
+                <thead class="text-secondary">
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">E-mail</th>
+                        <th scope="col">Opções</th>
+                    </tr>
+                </thead>
+                <tbody class="text-secondary">
+                    <% users.forEach((users) => { %>
+                    <tr>
+                        <th>
+                            <%= users.id %>
+                        </th>
+                        <th>
+                            <%= users.email %>
+                        </th>
+                        <th>
+                            <a href="/admin/edit/<%= users.id %>" class="btn btn-sm btn-warning">Trocar Senha</a>
+                            <form action="/admin/delete" method="POST" class="m-0 b-0 d-inline">
+                                <input type="hidden" name="id" value="<%= users.id %>">
+                                <button type="submit" id="btndelete" class="btn btn-sm btn-danger">Deletar</button>
+                            </form>
+                        </th>
+                    </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+            <% } else { %>
+                <h2 class="text-danger"><%= msg %> </h2>
+            <% } %>
+        </div>
+    </div>
+</div>
+<%- include('../partials/_footer.ejs') -%>

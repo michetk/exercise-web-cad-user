@@ -12,11 +12,11 @@
                     </div>
                     <div class="card-body">
                         <form action="/users/cadsave" method="POST" class="form">
-                            <input type="email" name="email" placeholder="Seu e-mail" class="form-control mb-1 <%= attrClassEmail %>">
+                            <input type="email" id="email" name="email" placeholder="Seu e-mail" class="form-control mb-1 <%= attrClassEmail %>">
                             <div class="invalid-feedback mt-0 mb-1"><%= feedbackEmail %></div>
-                            <input type="password" name="password" placeholder="Sua senha" class="form-control mb-1 <%= attrClassPassword %>">
+                            <input type="password" id="password" name="password" placeholder="Sua senha" class="form-control mb-1 <%= attrClassPassword %>">
                             <div class="invalid-feedback mt-0 mb-1"><%= feedbackPassword %></div>
-                            <input type="password" name="confirmpassword" placeholder="Confirme sua senha" class="form-control mb-1 <%= attrClassPassword %>">
+                            <input type="password" id="confirmpassword" name="confirmpassword" placeholder="Confirme sua senha" class="form-control mb-1 <%= attrClassPassword %>">
                             <div class="invalid-feedback mt-0 mb-1"><%= feedbackConfirmPassword %></div>
                             <button type="submit" class="btn btn-success mt-1">Cadastrar</button>
                         </form>

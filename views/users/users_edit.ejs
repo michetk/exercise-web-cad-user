@@ -1,0 +1,32 @@
+<%- include('../partials/_header.ejs') -%>
+
+<body>
+    <%- include('../partials/_navbar.ejs') -%>
+    <%- include('../partials/_msg.ejs') -%>
+    <div class="container-fluid">
+        <div class="low">
+            <div class="col col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        Trocar Senha
+                    </div>
+                    <div class="card-body">
+                        <form action="/admin/edited" method="POST" class="form">
+                            <input type="hidden" name="id" value="<%= user.id %>">
+                            <input type="email" id="email" value="<%= user.email %>" name="email" placeholder="Seu e-mail" class="form-control mb-1 <%= attrClassEmail %>" disabled>
+                            <input type="password" id="password" name="password" placeholder="Sua senha Atual" class="form-control mb-1">
+                            <div class="invalid-feedback mt-0 mb-1"><%= feedbackPassword %></div>
+                            <input type="password" id="newpassword" name="newpassword" placeholder="Sua nova senha" class="form-control mb-1 <%= attrClassPassword %>">
+                            <div class="invalid-feedback mt-0 mb-1"><%= feedbackPassword %></div>
+                            <input type="password" id="confirmpassword" name="confirmpassword" placeholder="Confirme sua nova senha" class="form-control mb-1 <%= attrClassPassword %>">
+                            <div class="invalid-feedback mt-0 mb-1"><%= feedbackConfirmPassword %></div>
+                            <button type="submit" class="btn btn-success mt-1">Cadastrar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+</body>
+
+<%- include('../partials/_footer.ejs') -%>
