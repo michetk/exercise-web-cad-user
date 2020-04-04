@@ -2,9 +2,11 @@ const express = require('express')
 const router = express.Router()
 const User = require('../users_controller/User')
 const bcrypt = require('bcryptjs')
+const adminAuth = require('../../middlewares/adminauth')
+const navBar = require('../../controller/navbar_controller/navbarcontroller')
 
 router.get('/users/cad', (req, res) => {
-    res.render('users/users_cad')
+    res.render('users/users_cad', {logout: navBar(req)})
 })
 
 router.post('/users/cadsave', (req, res) => {
@@ -58,16 +60,68 @@ router.post('/users/cadsave', (req, res) => {
 })
 
 router.get('/admin/login', (req, res) => {
-    res.render('users/users_login')
+    res.render('users/users_login', {logout: navBar(req)})
 })
 
-router.get('/admin/edit/:id', (req, res) => {
+router.post('/admin/login/into', (req, res) => {
+    let email = req.body.email
+    let password = req.body.password
+
+    cont = false
+    if (!email || email == typeof undefined || email == null) {
+        func.msgInvalid.msgFeedback(req, 'feedbackEmail', 'attrClassEmail', 'Houve um erro, verifique os campos em vermelho!', 'Campo e-mail ficou fazio!')
+    }
+    if (!password || password == typeof undefined || password == null) {
+        func.msgInvalid.msgFeedback(req, 'feedbackPassword', 'attrClassPassword', 'Houve um erro, verifique os campos em vermelho!', 'Campo senha ficou fazio!')
+    }
+    if (cont) {
+        res.redirect('/admin/login')
+    } else {
+        User.findOne({
+            where: {
+                email: email
+            }
+        })
+        .then(user => {
+            if (user) {
+                let compare = bcrypt.compareSync(password, user.password)
+                if(compare) {
+                    req.session.user = {
+                        id: user.id,
+                        email: user.email
+                    }
+                    res.redirect('/admin/users')
+                } else {
+                    req.flash('error_msg', 'Senha inválida!')
+                    res.redirect('/admin/login')
+                }
+            } else {
+                req.flash('error_msg', 'Usuário não encontrado!')
+                res.redirect('/admin/login')
+            }
+        })
+        .catch(err => {
+            req.flash('error_msg', 'Usuário não encontrado!')
+            res.redirect('/admin/login')
+        })
+    }
+
+
+})
+
+router.get('/logout', (req, res) => {
+    req.session.user = undefined
+    res.redirect('/')
+})
+
+router.get('/admin/edit/:id', adminAuth, (req, res) => {
     let id = req.params.id
     User.findByPk(id)
         .then(user => {
             if (user && !isNaN(id)) {
                 res.render('users/users_edit', {
-                    user: user
+                    user: user,
+                    logout: navBar(req)
                 })
             } else {
                 req.flash('error_msg', 'Usuário não encontrado')
@@ -80,7 +134,7 @@ router.get('/admin/edit/:id', (req, res) => {
         })
 })
 
-router.post('/admin/edited', (req, res) => {
+router.post('/admin/edited', adminAuth, (req, res) => {
     let id = req.body.id
     let password = req.body.password
     let newpassword = req.body.newpassword
@@ -144,7 +198,7 @@ router.post('/admin/edited', (req, res) => {
 
 })
 
-router.post('/admin/delete', (req, res) => {
+router.post('/admin/delete', adminAuth, (req, res) => {
     let id = req.body.id
     if (id && !isNaN(id)) {
         User.destroy({
@@ -166,13 +220,14 @@ router.post('/admin/delete', (req, res) => {
     }
 })
 
-router.get('/admin/users', (req, res) => {
+router.get('/admin/users', adminAuth, (req, res) => {
     User.findAll()
         .then(users => {
             if (users) {
                 res.render('users/users', {
                     users: users,
-                    msg: 'Não existe usuário cadastrado'
+                    msg: 'Não existe usuário cadastrado',
+                    logout: navBar(req)
                 })
             } else {
                 req.flash('error_msg', 'Erro interno!')

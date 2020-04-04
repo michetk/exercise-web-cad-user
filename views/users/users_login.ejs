@@ -1,0 +1,28 @@
+<%- include('../partials/_header.ejs') -%>
+
+<body>
+    <%- include('../partials/_navbar.ejs') -%>
+    <%- include('../partials/_msg.ejs') -%>
+    <div class="container-fluid">
+        <div class="low">
+            <div class="col col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        Login de Usuário
+                    </div>
+                    <div class="card-body">
+                        <form action="/admin/login/into" method="POST" class="form">
+                            <input type="email" id="email" name="email" placeholder="Seu e-mail" class="form-control mb-1 <%= attrClassEmail %>">
+                            <div class="invalid-feedback mt-0 mb-1"><%= feedbackEmail %></div>
+                            <input type="password" id="password" name="password" placeholder="Sua senha" class="form-control mb-1 <%= attrClassPassword %>">
+                            <div class="invalid-feedback mt-0 mb-1"><%= feedbackPassword %></div>
+                            <button type="submit" class="btn btn-success mt-1">Entrar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+</body>
+
+<%- include('../partials/_footer.ejs') -%>

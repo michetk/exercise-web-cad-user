@@ -7,15 +7,13 @@ const UsersController = require('./controller/users_controller/User_cntroller')
 const bodyParser = require('body-parser')
 const session = require('express-session')
 const flash = require('connect-flash')
+const navBar = require('./controller/navbar_controller/navbarcontroller')
 
 // session
 app.use(session({
     secret: Math.sqrt(9 * 5 + 4 * 3) + 'mmddfdDDOI',
     resave: true,
     saveUninitialized: true,
-    cookie: {
-        maxAge: 80000000
-    }
 }))
 app.use(flash())
 
@@ -29,7 +27,6 @@ app.use((req, res, next) => {
     res.locals.feedbackConfirmPassword = req.flash('feedbackConfirmPassword')
     res.locals.attrClassEmail = req.flash('attrClassEmail')
     res.locals.attrClassPassword = req.flash('attrClassPassword')
-    //res.locals.attrClassConfirmPassword = req.flash('attrClassConfirmPassword')
     next()
 })
 
@@ -47,7 +44,7 @@ app.use(express.static('public'))
 app.use('/', UsersController)
 
 app.get('/', (req, res) => {
-    res.render('index')
+    res.render('index', {logout: navBar(req)})
 })
 
 
